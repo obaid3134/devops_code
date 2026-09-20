@@ -1,25 +1,8 @@
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-
-- script: |
-    echo "Hello, Azure!"
-    echo "I am running inside the pipeline agent."
-
-    echo "Current directory:"
-    pwd
-
-    echo "Files:"
-    ls -la
-
-    echo "Git version:"
-    git --version
-
-    echo "Python version:"
-    python3 --version
-
-  displayName: 'Explore the pipeline agent'
+- task: AzureStaticWebApp@0
+      displayName: 'Deploy to Azure Static Web App'
+      inputs:
+        app_location: '/'
+        output_location: ''
+        skip_app_build: true
+        skip_api_build: true
+        azure_static_web_apps_api_token: $(a1646ce228e880a1b374974766080daf17af0be3417c9bbfde5f1d25d70d528906-c6e415c9-6992-42e4-abeb-59bb0ce05f3700019310a5227200)
