@@ -25,25 +25,28 @@ stages:
         ls -la
       displayName: 'Build Static Website'
 
-
 - stage: Deploy
   displayName: 'Deploy Stage'
-
   dependsOn: Build
   condition: succeeded()
 
   jobs:
   - job: Deploy
-    displayName: 'Deploy to Azure Static Web App'
+    displayName: 'Deploy to AKS Cluster'
 
     steps:
     - checkout: self
 
-    - task: AzureStaticWebApp@0
-      displayName: 'Deploy to Azure Static Web App'
+    # 1. Log into your Azure Subscription automatically inside the pipeline
+    - task: AzureCLI@2
+      displayName: 'Connect to AKS Cluster'
       inputs:
-        app_location: '/'
-        output_location: ''
-        skip_app_build: true
-        skip_api_build: true
-        azure_static_web_apps_api_token: $(AZURE_STATIC_WEB_APPS_API_TOKEN)
+        azureSubscription: 'Azure subscription 1' # Matches your subscription name
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          # Links the pipeline agent directly to your active 'devops' cluster
+          az aks get-credentials --resource-group devops --name devops
+          
+          # Deploys your web application manifests to your running cluster
+          kubectl apply -f app.yaml
