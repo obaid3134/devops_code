@@ -14,16 +14,18 @@ stages:
 
   jobs:
   - job: Build
-    displayName: 'Build Static Website'
+    displayName: 'Build and Verify Container'
 
     steps:
     - checkout: self
 
+    # 1. This tests your Dockerfile to make sure your HTML/CSS files package correctly
     - script: |
-        echo "Starting build..."
-        echo "Checking website files..."
-        ls -la
-      displayName: 'Build Static Website'
+        echo "Building your container image from Dockerfile..."
+        docker build -t local-web-app:latest .
+        echo "Container build passed successfully!"
+      displayName: 'Docker Build Check'
+
 
 - stage: Deploy
   displayName: 'Deploy Stage'
@@ -37,16 +39,13 @@ stages:
     steps:
     - checkout: self
 
-    # This task automatically grabs your subscription and connects to your cluster
+    # 2. This task connects to your 'devops' cluster and rolls out the app
     - task: AzureCLI@2
       displayName: 'Fetch Subscription and Connect to AKS'
       inputs:
-        azureSubscription: '$(azureServiceConnection)' # This maps to the variable we create in the UI
+        azureSubscription: '$(azureServiceConnection)' 
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          # Automatically hooks up your pipeline context to your active 'devops' cluster
           az aks get-credentials --resource-group devops --name devops
-          
-          # Deploys your web application files right into the cluster
           kubectl apply -f app.yaml
