@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: obaiddevopscode 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: obaiddevopscode
+  template:
+    metadata:
+      labels:
+        app: obaiddevopscode 
+    spec:
+      containers:
+        - name: obaiddevopscode 
+          image: devopsk8.azurecr.io/obaiddevopscode
+          ports:
+          - containerPort: 80
