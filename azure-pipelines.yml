@@ -37,16 +37,16 @@ stages:
     steps:
     - checkout: self
 
-    # 1. Log into your Azure Subscription automatically inside the pipeline
+    # This task automatically grabs your subscription and connects to your cluster
     - task: AzureCLI@2
-      displayName: 'Connect to AKS Cluster'
+      displayName: 'Fetch Subscription and Connect to AKS'
       inputs:
-        azureSubscription: 'Azure subscription 1' # Matches your subscription name
+        azureSubscription: '$(azureServiceConnection)' # This maps to the variable we create in the UI
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: |
-          # Links the pipeline agent directly to your active 'devops' cluster
+          # Automatically hooks up your pipeline context to your active 'devops' cluster
           az aks get-credentials --resource-group devops --name devops
           
-          # Deploys your web application manifests to your running cluster
+          # Deploys your web application files right into the cluster
           kubectl apply -f app.yaml
